@@ -33,9 +33,11 @@ pub struct ApplicationData {
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
+    // Logger middleware
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
 
+    // Initialize application data
     let application_data = ApplicationData {
         conn_pool: database::create_pool(),
     };

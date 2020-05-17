@@ -19,7 +19,7 @@ pub struct NewPost {
     title: String,
     body: Option<String>,
     #[serde(skip)]
-    pub user_id: Option<i32>,
+    pub user_id: i32,
 }
 
 #[derive(Serialize, Debug)]
@@ -36,7 +36,7 @@ impl From<Json<NewPost>> for NewPost {
         Self {
             title: new_post.title.to_owned(),
             body: new_post.body.to_owned(),
-            user_id: Some(-1),
+            user_id: -1,
         }
     }
 }

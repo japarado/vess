@@ -3,7 +3,13 @@ use crate::controllers;
 use actix_web::web;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/posts").service(controllers::post_controller::index));
+    cfg.service(
+        web::scope("/posts")
+            .service(controllers::post_controller::index)
+            .service(controllers::post_controller::show)
+            .service(controllers::post_controller::store)
+            .service(controllers::post_controller::destroy)
+    );
     // cfg.service(
     //     web::scope("/auth")
     //         .service(controllers::auth_controller::login)

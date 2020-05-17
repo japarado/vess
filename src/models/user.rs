@@ -21,6 +21,8 @@ pub struct NewUser {
     pub password: String,
 }
 
+pub type AuthUser = User;
+
 impl FromRequest for User {
     type Config = ();
     type Error = Error;

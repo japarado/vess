@@ -1,10 +1,9 @@
 use actix_web::web::Data;
 use std::sync::Mutex;
 
-#[allow(unused_imports)]
 use crate::errors::ServiceError;
 use crate::ApplicationData;
-#[allow(unused_imports)]
+use actix_web::error::{BlockingError, Error};
 use actix_web::HttpResponse;
 use serde::Deserialize;
 
@@ -22,8 +21,15 @@ pub struct IdPath {
 }
 
 pub type AppData = Data<Mutex<ApplicationData>>;
-pub type GenericRespnse = Result<HttpResponse, ServiceError>;
+pub type GenericResponse = Result<HttpResponse, ServiceError>;
 
-pub fn ok_response<T: serde::Serialize>(data: T) -> HttpResponse {
+pub fn ok_closure<T: serde::Serialize>(data: T) -> HttpResponse {
     HttpResponse::Ok().json(data)
 }
+
+// pub fn error_closure(err: BlockingError<Error>) -> HttpResponse {
+//     match err {
+//         BlockingError::Error(service_error) => service_error,
+//         BlockingError::Canceled => ServiceError::InternalServerError,
+//     }
+// }
