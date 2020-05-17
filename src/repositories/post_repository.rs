@@ -22,3 +22,9 @@ pub fn store(conn: &Conn, new_post: NewPost) -> Single<Post> {
 pub fn destroy(conn: &Conn, id: &i32) -> Single<Post> {
     Ok(diesel::delete(posts::table.find(id)).get_result(conn)?)
 }
+
+pub fn update(conn: &Conn, id: &i32, new_post: NewPost) -> Single<Post> {
+    Ok(diesel::update(posts::table.find(id))
+        .set(new_post)
+        .get_result(conn)?)
+}

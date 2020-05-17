@@ -76,3 +76,30 @@ pub async fn destroy(
         BlockingError::Canceled => ServiceError::InternalServerError,
     })
 }
+
+#[patch("/{id}")]
+pub async fn update(
+    data: AppData,
+    path: web::Path<IdPath>,
+    payload: web::Json<NewPost>,
+    auth_user: AuthUser,
+) -> GenericResponse {
+    web::block(move || -> Single<Post> {
+        let data = data.lock().unwrap();
+        let conn = &data.conn_pool.get().unwrap();
+        let mut new_post: NewPost = payload.into();
+        new_post.user_id = auth_user.id;
+        Ok(post_service::update(
+            conn,
+            &path.id,
+            &auth_user.id,
+            new_post,
+        )?)
+    })
+    .await
+    .map(|post| ok_closure(post))
+    .map_err(|err| match err {
+        BlockingError::Error(service_error) => service_error,
+        BlockingError::Canceled => ServiceError::InternalServerError,
+    })
+}

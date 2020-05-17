@@ -33,3 +33,12 @@ pub fn destroy(conn: &Conn, post_id: &i32, user_id: &i32) -> Single<Post> {
         Ok(post_repository::destroy(conn, post_id)?)
     }
 }
+
+pub fn update(conn: &Conn, id: &i32, user_id: &i32, new_post: NewPost) -> Single<Post> {
+    let post = post_repository::show(conn, id)?;
+    if &post.user_id == user_id {
+        Ok(post_repository::update(conn, id, new_post)?)
+    } else {
+        Err(ServiceError::Unauthorized)
+    }
+}
