@@ -28,6 +28,7 @@ pub struct NewPost {
 
 #[derive(Serialize, Debug)]
 pub struct PostWithComments {
+    pub id: i32,
     pub title: String,
     pub body: Option<String>,
     pub user_id: i32,

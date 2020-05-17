@@ -6,6 +6,7 @@ use crate::models::post_tag::{MultiplePostTags, PostTag, SinglePostTag};
 use crate::models::user::AuthUser;
 use crate::models::user::User;
 use diesel::prelude::*;
+use crate::services::post_service;
 
 use actix_web::error::BlockingError;
 
@@ -19,7 +20,7 @@ use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
 #[get("")]
 pub async fn index(pool: StatePool) -> Result<HttpResponse, ServiceError> {
-    web::block(move || -> MultiplePosts { Ok(Post::index(pool)?) })
+    web::block(move || -> MultiplePosts { Ok(post_service::index(pool)?) })
         .await
         .map(|posts| ok_response(posts))
         .map_err(|err| match err {
@@ -39,37 +40,38 @@ pub async fn mine(pool: StatePool, auth_user: AuthUser) -> Result<HttpResponse, 
         })
 }
 
-#[get("/{id}")]
-pub async fn show(pool: StatePool, path: web::Path<IdPath>) -> impl Responder {
-    use crate::schema::{comments, posts};
-    let conn = &pool.get().unwrap();
-
-    match posts::table.find(&path.id).first::<Post>(conn) {
-        Ok(target_post) => match Comment::belonging_to(&target_post).get_results::<Comment>(conn) {
-            Ok(post_comments) => {
-                let post_with_comments = PostWithComments {
-                    title: target_post.title,
-                    body: target_post.body,
-                    user_id: target_post.user_id,
-                    comments: Some(post_comments),
-                };
-                HttpResponse::Ok().json(post_with_comments)
-            }
-            Err(err) => HttpResponse::InternalServerError().json(err.to_string()),
-        },
-        Err(err) => HttpResponse::NotFound().json(err.to_string()),
-    }
-}
 // #[get("/{id}")]
-// pub async fn show(pool: StatePool, path: web::Path<IdPath>) -> Result<HttpResponse, ServiceError> {
-//     web::block(move || -> SinglePost { Ok(Post::show(pool, &path.id)?) })
-//         .await
-//         .map(|post| ok_response(post))
-//         .map_err(|err| match err {
-//             BlockingError::Error(service_error) => service_error,
-//             BlockingError::Canceled => ServiceError::InternalServerError,
-//         })
+// pub async fn show(pool: StatePool, path: web::Path<IdPath>) -> impl Responder {
+//     use crate::schema::{comments, posts};
+//     let conn = &pool.get().unwrap();
+
+//     match posts::table.find(&path.id).first::<Post>(conn) {
+//         Ok(target_post) => match Comment::belonging_to(&target_post).get_results::<Comment>(conn) {
+//             Ok(post_comments) => {
+//                 let post_with_comments = PostWithComments {
+//                     id: target_post.id,
+//                     title: target_post.title,
+//                     body: target_post.body,
+//                     user_id: target_post.user_id,
+//                     comments: Some(post_comments),
+//                 };
+//                 HttpResponse::Ok().json(post_with_comments)
+//             }
+//             Err(err) => HttpResponse::InternalServerError().json(err.to_string()),
+//         },
+//         Err(err) => HttpResponse::NotFound().json(err.to_string()),
+//     }
 // }
+#[get("/{id}")]
+pub async fn show(pool: StatePool, path: web::Path<IdPath>) -> Result<HttpResponse, ServiceError> {
+    web::block(move || -> SinglePost { Ok(Post::show(pool, &path.id)?) })
+        .await
+        .map(|post| ok_response(post))
+        .map_err(|err| match err {
+            BlockingError::Error(service_error) => service_error,
+            BlockingError::Canceled => ServiceError::InternalServerError,
+        })
+}
 
 #[post("")]
 pub async fn store(

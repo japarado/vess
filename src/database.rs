@@ -2,6 +2,8 @@ use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use std::env;
 
+pub type Conn =
+    diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<diesel::PgConnection>>;
 type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 pub type StatePool = actix_web::web::Data<Pool>;
 
