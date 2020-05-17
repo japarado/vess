@@ -5,8 +5,8 @@ use crate::models::post::{MultiplePosts, NewPost, Post, PostWithComments, Single
 use crate::models::post_tag::{MultiplePostTags, PostTag, SinglePostTag};
 use crate::models::user::AuthUser;
 use crate::models::user::User;
-use diesel::prelude::*;
 use crate::services::post_service;
+use diesel::prelude::*;
 
 use actix_web::error::BlockingError;
 
