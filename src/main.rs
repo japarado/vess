@@ -2,6 +2,8 @@ extern crate frank_jwt;
 #[macro_use]
 extern crate diesel;
 
+use std::sync::Mutex;
+
 use crate::errors::ServiceError;
 use actix_cors::Cors;
 use actix_identity::{CookieIdentityPolicy, IdentityService};
@@ -16,12 +18,16 @@ use std::env;
 mod controllers;
 mod database;
 mod errors;
-mod middleware;
 mod models;
 mod repositories;
 mod routes;
 mod schema;
 mod services;
+
+#[derive(Clone)]
+pub struct ApplicationData {
+    conn_pool: database::Pool,
+}
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -30,16 +36,18 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
 
-    let pool = database::create_pool();
+    let application_data = ApplicationData {
+        conn_pool: database::create_pool(),
+    };
+
+    let data = web::Data::new(Mutex::new(application_data));
 
     HttpServer::new(move || {
         App::new()
-            .data(pool.clone())
+            .app_data(data.clone())
             .configure(routes::config)
             .service(index)
             .default_service(web::route().to(fallback_route))
-            // .wrap(middleware::say_hi_middleware::SayHi)
-            // .wrap(middleware::auth_middleware::Auth)
             .wrap(Cors::new().supports_credentials().max_age(3600).finish())
             .wrap(IdentityService::new(
                 CookieIdentityPolicy::new(
@@ -63,7 +71,7 @@ async fn main() -> std::io::Result<()> {
 
 #[get("/")]
 pub async fn index() -> Result<HttpResponse, ServiceError> {
-    Ok(HttpResponse::Ok().json("Main API Page"))
+    Ok(HttpResponse::Ok().json("Application Root"))
 }
 
 pub async fn fallback_route() -> impl Responder {

@@ -1,16 +1,10 @@
-use crate::database::StatePool;
 use crate::errors::ServiceError;
 use crate::schema::users;
-use crate::schema::users::dsl::*;
 use actix_identity::Identity;
-use actix_identity::RequestIdentity;
 use actix_web::{dev::Payload, Error, FromRequest, HttpRequest};
-use diesel::prelude::*;
 use futures::future::Future;
 use serde::{Deserialize, Serialize};
 use std::pin::Pin;
-
-pub type SingleUser = Result<User, ServiceError>;
 
 #[derive(Serialize, Deserialize, Identifiable, Queryable, PartialEq, Debug)]
 pub struct User {
@@ -27,8 +21,6 @@ pub struct NewUser {
     pub password: String,
 }
 
-pub type AuthUser = User;
-
 impl FromRequest for User {
     type Config = ();
     type Error = Error;
@@ -44,12 +36,5 @@ impl FromRequest for User {
             }
             Err(Error::from(ServiceError::Unauthorized))
         })
-    }
-}
-
-impl User {
-    pub fn show(pool: StatePool, user_pk: &i32) -> Result<Self, ServiceError> {
-        let conn = &pool.get().unwrap();
-        Ok(users.find(user_pk).first(conn)?)
     }
 }

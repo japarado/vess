@@ -1,36 +1,22 @@
-use crate::database::StatePool;
+use super::AppData;
+use crate::models::user::{NewUser, User};
 use actix_identity::Identity;
-use actix_web::{delete, error::BlockingError, get, post, web, HttpResponse, Responder};
-
-use crate::controllers::ok_response;
-use crate::errors::ServiceError;
-use crate::models::user::{AuthUser, NewUser, SingleUser, User};
-
+use actix_web::{delete, post, web, HttpResponse, Responder};
 use argon2::{self, Config};
 use diesel::prelude::*;
 use diesel::result::Error;
 use std::env;
 
-#[get("/me")]
-pub async fn me(pool: StatePool, auth_user: AuthUser) -> Result<HttpResponse, ServiceError> {
-    println!("{}", auth_user.id);
-    web::block(move || -> SingleUser { Ok(User::show(pool, &auth_user.id)?) })
-        .await
-        .map(|post| ok_response(post))
-        .map_err(|err| match err {
-            BlockingError::Error(service_error) => service_error,
-            BlockingError::Canceled => ServiceError::InternalServerError,
-        })
-}
-
 #[post("/login")]
 pub async fn login(
-    pool: StatePool,
+    app_data: AppData,
     payload: web::Json<NewUser>,
     identity: Identity,
 ) -> impl Responder {
     use crate::schema::users::dsl::*;
-    let conn = &pool.get().unwrap();
+    let data = app_data.lock().unwrap();
+
+    let conn = &data.conn_pool.get().unwrap();
 
     let query_result = users
         .filter(email.eq(payload.email.to_owned()))
@@ -55,16 +41,12 @@ pub async fn login(
 }
 
 #[post("/register")]
-pub async fn register(pool: StatePool, payload: web::Json<NewUser>) -> impl Responder {
+pub async fn register(app_data: AppData, payload: web::Json<NewUser>) -> impl Responder {
     use crate::schema::users::dsl::*;
-    let conn = &pool.get().unwrap();
+    let data = app_data.lock().unwrap();
+    let conn = &data.conn_pool.get().unwrap();
 
     let hashed_password = create_hash(payload.password.to_owned());
-
-    // let new_user = NewUser {
-    //     email: payload.email.to_owned(),
-    //     password: hashed_password,
-    // };
 
     let insert_result: Result<User, Error> = diesel::insert_into(users)
         .values(NewUser {
