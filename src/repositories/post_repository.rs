@@ -1,5 +1,4 @@
 use crate::database::Conn;
-use crate::errors::ServiceError;
 use crate::models::post::{NewPost, Post};
 use crate::models::{Multiple, Single};
 use crate::schema::posts;

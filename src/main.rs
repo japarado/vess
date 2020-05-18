@@ -50,7 +50,7 @@ async fn main() -> std::io::Result<()> {
             .configure(routes::config)
             .service(index)
             .default_service(web::route().to(fallback_route))
-            .wrap(Cors::new().supports_credentials().max_age(3600).finish())
+            .wrap(Cors::new().supports_credentials().finish())
             .wrap(IdentityService::new(
                 CookieIdentityPolicy::new(
                     env::var("SECRET_KEY")

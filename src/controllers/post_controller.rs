@@ -1,6 +1,6 @@
 use super::{ok_closure, AppData, GenericResponse, IdPath};
 use crate::errors::ServiceError;
-use crate::models::post::{NewPost, Post, PostWithComments};
+use crate::models::post::{FullPost, NewPost, Post};
 use crate::models::user::AuthUser;
 use crate::models::{Multiple, Single};
 use crate::services::post_service;
@@ -24,7 +24,7 @@ pub async fn index(data: AppData) -> GenericResponse {
 
 #[get("/{id}")]
 pub async fn show(data: AppData, path: web::Path<IdPath>) -> GenericResponse {
-    web::block(move || -> Single<PostWithComments> {
+    web::block(move || -> Single<FullPost> {
         let data = data.lock().unwrap();
         let conn = &data.conn_pool.get().unwrap();
         Ok(post_service::show(conn, &path.id)?)

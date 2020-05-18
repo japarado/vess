@@ -23,12 +23,12 @@ pub struct NewPost {
 }
 
 #[derive(Serialize, Debug)]
-pub struct PostWithComments {
+pub struct FullPost {
     pub id: i32,
     pub title: String,
     pub body: Option<String>,
-    pub user_id: i32,
-    pub comments: Option<Vec<Comment>>,
+    pub user: User,
+    pub comments: Vec<Comment>,
 }
 
 impl From<Json<NewPost>> for NewPost {

@@ -9,7 +9,13 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(controllers::post_controller::show)
             .service(controllers::post_controller::store)
             .service(controllers::post_controller::destroy)
-            .service(controllers::post_controller::update)
+            .service(controllers::post_controller::update),
+    )
+    .service(
+        web::scope("/auth")
+            .service(controllers::auth_controller::login)
+            .service(controllers::auth_controller::register)
+            .service(controllers::auth_controller::logout),
     );
     // cfg.service(
     //     web::scope("/auth")
