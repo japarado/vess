@@ -1,9 +1,9 @@
 use crate::database::Conn;
 use crate::errors::ServiceError;
+use crate::models::comment::Comment;
 use crate::models::post::{FullPost, NewPost, Post};
 use crate::models::{Multiple, Single};
-use crate::repositories::post_repository;
-use crate::repositories::{comment_repository, user_repository};
+use crate::repositories::{comment_repository, post_repository, user_repository};
 
 pub fn index(conn: &Conn) -> Multiple<Post> {
     Ok(post_repository::index(conn)?)
@@ -12,7 +12,8 @@ pub fn index(conn: &Conn) -> Multiple<Post> {
 pub fn show(conn: &Conn, id: &i32) -> Single<FullPost> {
     let post = post_repository::show(conn, id)?;
     let user = user_repository::show(conn, &post.user_id)?;
-    let comments = comment_repository::get_by_post_id(conn, id)?;
+    let comments = comment_repository::get_by_post(conn, &post)?;
+
     Ok(FullPost {
         id: post.id,
         title: post.title,

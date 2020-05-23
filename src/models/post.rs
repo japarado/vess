@@ -1,4 +1,4 @@
-use crate::models::comment::Comment;
+use crate::models::comment::FullComment;
 use crate::models::user::User;
 use crate::schema::posts;
 use actix_web::web::Json;
@@ -28,7 +28,7 @@ pub struct FullPost {
     pub title: String,
     pub body: Option<String>,
     pub user: User,
-    pub comments: Vec<Comment>,
+    pub comments: Vec<FullComment>,
 }
 
 impl From<Json<NewPost>> for NewPost {

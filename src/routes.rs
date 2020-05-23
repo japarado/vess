@@ -1,6 +1,7 @@
+use actix_web::web;
+
 #[allow(unused_imports)]
 use crate::controllers;
-use actix_web::web;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -16,7 +17,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(controllers::auth_controller::login)
             .service(controllers::auth_controller::register)
             .service(controllers::auth_controller::logout),
-    );
+    )
+    .service(web::scope("/comments").service(controllers::comment_controller::show));
     // cfg.service(
     //     web::scope("/auth")
     //         .service(controllers::auth_controller::login)
