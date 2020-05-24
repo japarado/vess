@@ -47,7 +47,7 @@ pub fn get_by_post_id(conn: &Conn, pid: &i32) -> Multiple<Comment> {
 pub fn get_by_post(conn: &Conn, post: &Post) -> Multiple<FullComment> {
     let mut full_comments = Vec::new();
     let comments_user_pairs: Vec<(Comment, User)> =
-        comments::table.inner_join(users::table).get_results(conn)?;
+        comments::table.inner_join(users::table).filter(comments::post_id.eq(post.id)).get_results(conn)?;
 
     for comment_user in comments_user_pairs.into_iter() {
         let comment = comment_user.0;

@@ -20,7 +20,7 @@ pub struct NewComment {
     pub post_id: i32,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Queryable, Debug)]
 pub struct FullComment {
     pub id: i32,
     pub contents: String,
