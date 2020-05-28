@@ -18,7 +18,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(controllers::auth_controller::register)
             .service(controllers::auth_controller::logout),
     )
-    .service(web::scope("/comments").service(controllers::comment_controller::show));
+    .service(
+        web::scope("/comments")
+            .service(controllers::comment_controller::show)
+            .service(controllers::comment_controller::destroy),
+    );
     // cfg.service(
     //     web::scope("/auth")
     //         .service(controllers::auth_controller::login)

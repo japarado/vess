@@ -12,7 +12,7 @@ pub fn index(conn: &Conn) -> Multiple<Post> {
 pub fn show(conn: &Conn, id: &i32) -> Single<FullPost> {
     let post = post_repository::show(conn, id)?;
     let user = user_repository::show(conn, &post.user_id)?;
-    let comments = comment_repository::get_by_post(conn, &post)?;
+    let comments = comment_repository::get_by_post_id(conn, &post.id)?;
 
     Ok(FullPost {
         id: post.id,
