@@ -2,7 +2,7 @@ use diesel::prelude;
 
 use crate::database::Conn;
 use crate::errors::ServiceError;
-use crate::models::comment::{Comment, NewComment, FullComment};
+use crate::models::comment::{Comment, FullComment, NewComment};
 use crate::models::{Multiple, Single};
 use crate::repositories::comment_repository;
 use crate::schema::{comments, users};

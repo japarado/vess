@@ -22,7 +22,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("/comments")
             .service(controllers::comment_controller::show)
             .service(controllers::comment_controller::destroy),
-    );
+    )
+    .service(web::scope("/users").service(controllers::user_controller::show));
     // cfg.service(
     //     web::scope("/auth")
     //         .service(controllers::auth_controller::login)
