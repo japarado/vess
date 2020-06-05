@@ -52,6 +52,10 @@ pub async fn register(app_data: AppData, payload: web::Json<NewUser>) -> impl Re
         .values(NewUser {
             email: payload.email.to_owned(),
             password: hashed_password,
+            display_name: None,
+            profile_picture: None,
+            display_picture: None,
+            bio: None,
         })
         .get_result::<User>(conn);
 

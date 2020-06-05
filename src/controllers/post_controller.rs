@@ -103,3 +103,11 @@ pub async fn update(
         BlockingError::Canceled => ServiceError::InternalServerError,
     })
 }
+
+// #[get("/mine")]
+// pub async fn mine(data: AppData, path: web::Path<Data>, auth_user: AuthUser) -> GenericResponse {
+//     web::block(move || -> Multiple<Post> {
+//         let data = data.lock().unwrap();
+//         let conn = &data.conn_pool.get().unwrap();
+//     })
+// }

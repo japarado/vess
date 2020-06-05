@@ -67,3 +67,9 @@ pub fn get_by_post_id(conn: &Conn, post_id: &i32) -> Multiple<FullComment> {
 
     Ok(full_comments)
 }
+
+pub fn store(conn: &Conn, new_comment: NewComment) -> Single<Comment> {
+    Ok(diesel::insert_into(comments::table)
+        .values(new_comment)
+        .get_result(conn)?)
+}

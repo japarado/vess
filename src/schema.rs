@@ -35,6 +35,10 @@ table! {
     users (id) {
         id -> Int4,
         email -> Varchar,
+        display_name -> Nullable<Varchar>,
+        display_picture -> Nullable<Varchar>,
+        profile_picture -> Nullable<Varchar>,
+        bio -> Nullable<Text>,
         password -> Varchar,
     }
 }

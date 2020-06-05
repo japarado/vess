@@ -1,6 +1,7 @@
 use crate::errors::ServiceError;
 use crate::schema::users;
 use actix_identity::Identity;
+use actix_web::web::Json;
 use actix_web::{dev::Payload, Error, FromRequest, HttpRequest};
 use futures::future::Future;
 use serde::{Deserialize, Serialize};
@@ -10,15 +11,23 @@ use std::pin::Pin;
 pub struct User {
     pub id: i32,
     pub email: String,
+    pub display_name: Option<String>,
+    pub profile_picture: Option<String>,
+    pub display_picture: Option<String>,
+    pub bio: Option<String>,
     #[serde(skip)]
     pub password: String,
 }
 
-#[derive(Serialize, Deserialize, Insertable, Debug)]
+#[derive(Serialize, Deserialize, Insertable, AsChangeset, Debug)]
 #[table_name = "users"]
 pub struct NewUser {
     pub email: String,
     pub password: String,
+    pub display_name: Option<String>,
+    pub profile_picture: Option<String>,
+    pub display_picture: Option<String>,
+    pub bio: Option<String>,
 }
 
 pub type AuthUser = User;
@@ -38,5 +47,18 @@ impl FromRequest for User {
             }
             Err(Error::from(ServiceError::Unauthorized))
         })
+    }
+}
+
+impl From<Json<NewUser>> for NewUser {
+    fn from(new_user: Json<NewUser>) -> Self {
+        Self {
+            email: new_user.email.clone(),
+            display_name: new_user.display_name.clone(),
+            profile_picture: new_user.profile_picture.clone(),
+            display_picture: new_user.display_picture.clone(),
+            bio: new_user.bio.clone(),
+            password: new_user.password.clone(),
+        }
     }
 }

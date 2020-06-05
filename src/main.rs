@@ -34,7 +34,7 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
     // Logger middleware
-    std::env::set_var("RUST_LOG", "actix_web=info");
+    std::env::set_var("RUST_LOG", "actix_web=info,error");
     env_logger::init();
 
     // Initialize application data

@@ -14,3 +14,7 @@ pub fn show(conn: &Conn, id: &i32) -> Single<FullComment> {
 pub fn destroy(conn: &Conn, id: &i32, user_id: &i32) -> Single<Comment> {
     Ok(comment_repository::destroy(conn, id, user_id)?)
 }
+
+pub fn store(conn: &Conn, new_comment: NewComment) -> Single<Comment> {
+    Ok(comment_repository::store(conn, new_comment)?)
+}
