@@ -49,4 +49,10 @@ joinable!(post_tags -> posts (post_id));
 joinable!(post_tags -> tags (tag_id));
 joinable!(posts -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(comments, post_tags, posts, tags, users,);
+allow_tables_to_appear_in_same_query!(
+    comments,
+    post_tags,
+    posts,
+    tags,
+    users,
+);

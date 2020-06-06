@@ -62,3 +62,16 @@ impl From<Json<NewUser>> for NewUser {
         }
     }
 }
+
+impl From<User> for NewUser {
+    fn from(user: User) -> Self {
+        Self {
+            email: user.email,
+            password: user.password,
+            display_name: user.display_name,
+            display_picture: user.display_picture,
+            profile_picture: user.profile_picture,
+            bio: user.bio,
+        }
+    }
+}

@@ -27,7 +27,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     .service(
         web::scope("/users")
             .service(controllers::user_controller::index)
-            .service(controllers::user_controller::show),
+            .service(controllers::user_controller::show)
+            .service(controllers::user_controller::update),
     );
     // cfg.service(
     //     web::scope("/auth")
