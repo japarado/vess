@@ -9,7 +9,7 @@ pub enum ServiceError {
     #[display(fmr = "Internal Sever Error")]
     InternalServerError,
 
-    #[display(fmr = "Bad Requst: {}", _0)]
+    #[display(fmt = "Bad Requst: {}", _0)]
     BadRequest(String),
 
     #[display(fmt = "Unauthorized")]
@@ -17,6 +17,9 @@ pub enum ServiceError {
 
     #[display(fmt = "Not Found")]
     NotFound(String),
+
+    #[display(fmt = "Conflict")]
+    Conflict(String),
 }
 
 impl ResponseError for ServiceError {
@@ -28,6 +31,7 @@ impl ResponseError for ServiceError {
             ServiceError::BadRequest(ref message) => HttpResponse::BadRequest().json(message),
             ServiceError::Unauthorized => HttpResponse::Unauthorized().json("Unauthorized"),
             ServiceError::NotFound(ref message) => HttpResponse::NotFound().json(message),
+            ServiceError::Conflict(ref message) => HttpResponse::Conflict().json(message),
         }
     }
 }

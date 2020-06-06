@@ -1,6 +1,6 @@
 use super::{ok_closure, AppData, GenericResponse, IdPath};
 use crate::errors::ServiceError;
-use crate::models::user::{NewUser, User};
+use crate::models::user::{AuthUser, NewUser, ResetPasswordRequest, User};
 use crate::models::{Multiple, Single};
 use crate::services::user_service;
 use actix_web::error::BlockingError;
@@ -46,6 +46,29 @@ pub async fn update(
         let data = data.lock().unwrap();
         let conn = &data.conn_pool.get().unwrap();
         Ok(user_service::update(conn, &path.id, payload.into())?)
+    })
+    .await
+    .map(|user| HttpResponse::Ok().json(user))
+    .map_err(|err| match err {
+        BlockingError::Error(service_error) => service_error,
+        BlockingError::Canceled => ServiceError::InternalServerError,
+    })
+}
+
+#[patch("/reset-password")]
+pub async fn reset_password(
+    data: AppData,
+    payload: web::Json<ResetPasswordRequest>,
+    auth_user: AuthUser,
+) -> GenericResponse {
+    web::block(move || -> Single<User> {
+        let data = data.lock().unwrap();
+        let conn = &data.conn_pool.get().unwrap();
+        Ok(user_service::reset_password(
+            conn,
+            &auth_user.id,
+            payload.into(),
+        )?)
     })
     .await
     .map(|user| HttpResponse::Ok().json(user))

@@ -51,14 +51,14 @@ impl FromRequest for User {
 }
 
 impl From<Json<NewUser>> for NewUser {
-    fn from(new_user: Json<NewUser>) -> Self {
+    fn from(new_user_json: Json<NewUser>) -> Self {
         Self {
-            email: new_user.email.clone(),
-            display_name: new_user.display_name.clone(),
-            profile_picture: new_user.profile_picture.clone(),
-            display_picture: new_user.display_picture.clone(),
-            bio: new_user.bio.clone(),
-            password: new_user.password.clone(),
+            email: new_user_json.email.clone(),
+            display_name: new_user_json.display_name.clone(),
+            profile_picture: new_user_json.profile_picture.clone(),
+            display_picture: new_user_json.display_picture.clone(),
+            bio: new_user_json.bio.clone(),
+            password: new_user_json.password.clone(),
         }
     }
 }
@@ -72,6 +72,21 @@ impl From<User> for NewUser {
             display_picture: user.display_picture,
             profile_picture: user.profile_picture,
             bio: user.bio,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+pub struct ResetPasswordRequest {
+    pub password: String,
+    pub confirmation: String,
+}
+
+impl From<Json<ResetPasswordRequest>> for ResetPasswordRequest {
+    fn from(reset_password_json: Json<ResetPasswordRequest>) -> Self {
+        Self {
+            password: reset_password_json.password.to_owned(),
+            confirmation: reset_password_json.confirmation.to_owned(),
         }
     }
 }
