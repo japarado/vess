@@ -71,7 +71,7 @@ pub async fn logout(identity: Identity) -> impl Responder {
     HttpResponse::Ok().json("Logged Out")
 }
 
-fn create_hash(text: String) -> String {
+pub fn create_hash(text: String) -> String {
     let text_to_hash = text.into_bytes();
     let salt = env::var("SALT")
         .unwrap_or(String::from("Default Salt Value"))

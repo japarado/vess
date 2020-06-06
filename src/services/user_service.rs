@@ -3,6 +3,8 @@ use crate::errors::ServiceError;
 use crate::models::user::{NewUser, ResetPasswordRequest, User};
 use crate::models::{Multiple, Single};
 use crate::repositories::user_repository;
+// TODO Move the auth controller and password reset to their own domains 
+use crate::controllers::auth_controller::create_hash;
 
 pub fn index(conn: &Conn) -> Multiple<User> {
     Ok(user_repository::index(conn)?)
@@ -33,7 +35,7 @@ pub fn reset_password(conn: &Conn, id: &i32, payload: ResetPasswordRequest) -> S
 
     if &user.id == id {
         if payload.password == payload.confirmation {
-            user.password = payload.password;
+            user.password = create_hash(payload.password);
             Ok(user_repository::update(conn, id, user.into())?)
         } else {
             Err(ServiceError::Conflict("Passwords do not match".to_string()))
