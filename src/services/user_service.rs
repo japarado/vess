@@ -3,7 +3,8 @@ use crate::errors::ServiceError;
 use crate::models::user::{NewUser, ResetPasswordRequest, User};
 use crate::models::{Multiple, Single};
 use crate::repositories::user_repository;
-// TODO Move the auth controller and password reset to their own domains 
+
+// TODO Move the auth controller and password reset to their own domains
 use crate::controllers::auth_controller::create_hash;
 
 pub fn index(conn: &Conn) -> Multiple<User> {

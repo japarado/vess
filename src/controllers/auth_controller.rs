@@ -1,43 +1,27 @@
 use super::AppData;
+use super::GenericResponse;
 use crate::models::user::{NewUser, User};
+use crate::models::Single;
 use actix_identity::Identity;
+use actix_web::error::BlockingError;
 use actix_web::{delete, post, web, HttpResponse, Responder};
 use argon2::{self, Config};
 use diesel::prelude::*;
 use diesel::result::Error;
 use std::env;
 
+use crate::services::auth_service;
+
 #[post("/login")]
 pub async fn login(
-    app_data: AppData,
+    data: AppData,
     payload: web::Json<NewUser>,
     identity: Identity,
-) -> impl Responder {
-    use crate::schema::users::dsl::*;
-    let data = app_data.lock().unwrap();
-
+) -> GenericResponse {
+    let data = data.lock().unwrap();
     let conn = &data.conn_pool.get().unwrap();
-
-    let query_result = users
-        .filter(email.eq(payload.email.to_owned()))
-        .first::<User>(conn);
-
-    match query_result {
-        Ok(user) => {
-            let password_correct =
-                verify_hash(payload.password.to_owned(), user.password.to_owned());
-            if password_correct {
-                let user_string: String = serde_json::to_string(&user).unwrap();
-                println!("User String: {}", user_string);
-                identity.remember(user_string);
-                println!("Identity Value: {:?}", identity.identity());
-                HttpResponse::Ok().json(user)
-            } else {
-                HttpResponse::Unauthorized().json("password incorrect")
-            }
-        }
-        Err(_) => HttpResponse::Unauthorized().json("email not found"),
-    }
+    let user = auth_service::login(conn, identity, payload.into())?;
+    Ok(HttpResponse::Ok().json(user))
 }
 
 #[post("/register")]

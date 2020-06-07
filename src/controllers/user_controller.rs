@@ -6,7 +6,6 @@ use crate::services::user_service;
 use actix_web::error::BlockingError;
 use actix_web::{delete, get, patch, post, web, HttpResponse};
 
-
 #[get("")]
 pub async fn index(data: AppData) -> GenericResponse {
     web::block(move || -> Multiple<User> {

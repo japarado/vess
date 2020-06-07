@@ -1,5 +1,4 @@
 use crate::database::Conn;
-use crate::errors::ServiceError;
 use crate::models::user::{NewUser, User};
 use crate::models::{Multiple, Single};
 use crate::schema::users;
@@ -17,4 +16,8 @@ pub fn update(conn: &Conn, id: &i32, new_user: NewUser) -> Single<User> {
     let target = users::table.find(id);
 
     Ok(diesel::update(target).set(new_user).get_result(conn)?)
+}
+
+pub fn find_by_email(conn: &Conn, email: &str) -> Single<User> {
+    Ok(users::table.filter(users::email.eq(email)).first(conn)?)
 }
