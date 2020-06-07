@@ -10,6 +10,8 @@ use diesel::prelude::*;
 use diesel::result::Error;
 use std::env;
 
+use crate::controllers::ok_closure;
+use crate::errors::ServiceError;
 use crate::services::auth_service;
 
 #[post("/login")]
@@ -18,10 +20,22 @@ pub async fn login(
     payload: web::Json<NewUser>,
     identity: Identity,
 ) -> GenericResponse {
-    let data = data.lock().unwrap();
-    let conn = &data.conn_pool.get().unwrap();
-    let user = auth_service::login(conn, identity, payload.into())?;
-    Ok(HttpResponse::Ok().json(user))
+    web::block(move || -> Single<User> {
+        let data = data.lock().unwrap();
+        let conn = &data.conn_pool.get().unwrap();
+        let user = auth_service::login(conn, payload.into())?;
+        Ok(user)
+    })
+    .await
+    .map(|user| {
+        let user_string = serde_json::to_string(&user).unwrap();
+        identity.remember(user_string);
+        ok_closure(user)
+    })
+    .map_err(|err| match err {
+        BlockingError::Error(service_error) => service_error,
+        BlockingError::Canceled => ServiceError::InternalServerError,
+    })
 }
 
 #[post("/register")]
