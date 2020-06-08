@@ -30,6 +30,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(controllers::user_controller::index)
             .service(controllers::user_controller::show)
             .service(controllers::user_controller::update),
+    )
+    .service(
+        web::scope("/tags")
+            .service(controllers::tag_controller::index)
+            .service(controllers::tag_controller::store),
     );
     // cfg.service(
     //     web::scope("/auth")

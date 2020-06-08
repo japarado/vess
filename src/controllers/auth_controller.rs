@@ -58,17 +58,3 @@ pub async fn logout(identity: Identity) -> impl Responder {
     identity.forget();
     HttpResponse::Ok().json("Logged Out")
 }
-
-pub fn create_hash(text: String) -> String {
-    let text_to_hash = text.into_bytes();
-    let salt = env::var("SALT")
-        .unwrap_or(String::from("Default Salt Value"))
-        .into_bytes();
-
-    let config = Config::default();
-    argon2::hash_encoded(&text_to_hash, &salt, &config).unwrap()
-}
-
-fn verify_hash(text: String, hash: String) -> bool {
-    return argon2::verify_encoded(&hash, &text.into_bytes()).unwrap();
-}

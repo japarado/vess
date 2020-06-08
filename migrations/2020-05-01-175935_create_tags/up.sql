@@ -1,6 +1,7 @@
 -- Your SQL goes here
 CREATE TABLE tags(
 	id SERIAL PRIMARY KEY,
-	name VARCHAR(255) NOT NULL,
-	description TEXT
+	name VARCHAR(255) UNIQUE NOT NULL,
+	description TEXT,
+	user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE SET NULL
 );
