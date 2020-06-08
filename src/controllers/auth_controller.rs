@@ -40,27 +40,17 @@ pub async fn login(
 
 #[post("/register")]
 pub async fn register(app_data: AppData, payload: web::Json<NewUser>) -> impl Responder {
-    use crate::schema::users::dsl::*;
-    let data = app_data.lock().unwrap();
-    let conn = &data.conn_pool.get().unwrap();
-
-    let hashed_password = create_hash(payload.password.to_owned());
-
-    let insert_result: Result<User, Error> = diesel::insert_into(users)
-        .values(NewUser {
-            email: payload.email.to_owned(),
-            password: hashed_password,
-            display_name: None,
-            profile_picture: None,
-            display_picture: None,
-            bio: None,
-        })
-        .get_result::<User>(conn);
-
-    match insert_result {
-        Ok(user) => HttpResponse::Ok().json(user),
-        Err(_) => HttpResponse::InternalServerError().json("Error creating user"),
-    }
+    web::block(move || -> Single<User> {
+        let data = app_data.lock().unwrap();
+        let conn = &data.conn_pool.get().unwrap();
+        Ok(auth_service::register(conn, payload.into())?)
+    })
+    .await
+    .map(|user| ok_closure(user))
+    .map_err(|err| match err {
+        BlockingError::Error(service_error) => service_error,
+        BlockingError::Canceled => ServiceError::InternalServerError,
+    })
 }
 
 #[delete("/logout")]

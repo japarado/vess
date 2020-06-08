@@ -42,7 +42,7 @@ impl From<DBError> for ServiceError {
             DBError::DatabaseError(kind, info) => {
                 if let DatabaseErrorKind::UniqueViolation = kind {
                     let message = info.details().unwrap_or_else(|| info.message()).to_string();
-                    return ServiceError::BadRequest(message);
+                    return ServiceError::Conflict(message);
                 }
                 ServiceError::InternalServerError
             }

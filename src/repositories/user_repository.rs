@@ -12,6 +12,12 @@ pub fn show(conn: &Conn, id: &i32) -> Single<User> {
     Ok(users::table.find(id).first(conn)?)
 }
 
+pub fn store(conn: &Conn, new_user: NewUser) -> Single<User> {
+    Ok(diesel::insert_into(users::table)
+        .values(new_user)
+        .get_result(conn)?)
+}
+
 pub fn update(conn: &Conn, id: &i32, new_user: NewUser) -> Single<User> {
     let target = users::table.find(id);
 
