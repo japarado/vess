@@ -13,3 +13,7 @@ pub fn store(conn: &Conn, new_tag: NewTag) -> Single<Tag> {
         .values(new_tag)
         .get_result(conn)?)
 }
+
+pub fn show(conn: &Conn, id: &i32) -> Single<Tag> {
+    Ok(tags::table.find(id).first(conn)?)
+}

@@ -8,6 +8,13 @@ table! {
 }
 
 table! {
+    friends (user_id, friend_id) {
+        user_id -> Int4,
+        friend_id -> Int4,
+    }
+}
+
+table! {
     post_tags (post_id, tag_id) {
         post_id -> Int4,
         tag_id -> Int4,
@@ -51,4 +58,11 @@ joinable!(post_tags -> tags (tag_id));
 joinable!(posts -> users (user_id));
 joinable!(tags -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(comments, post_tags, posts, tags, users,);
+allow_tables_to_appear_in_same_query!(
+    comments,
+    friends,
+    post_tags,
+    posts,
+    tags,
+    users,
+);

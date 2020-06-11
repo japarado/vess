@@ -20,13 +20,13 @@ pub struct NewTag {
     pub user_id: i32,
 }
 
-// #[derive(Serialize, Debug)]
-// pub struct FullTag {
-//     pub name: String,
-//     pub description: Option<String>,
-//     user: User,
-//     posts: Vec<Post>,
-// }
+#[derive(Serialize, Debug)]
+pub struct FullTag {
+    pub name: String,
+    pub description: Option<String>,
+    pub user: User,
+    pub posts: Vec<Post>,
+}
 
 impl From<Json<NewTag>> for NewTag {
     fn from(new_tag: Json<NewTag>) -> Self {
