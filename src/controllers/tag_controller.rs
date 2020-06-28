@@ -14,7 +14,7 @@ pub async fn index(data: AppData) -> GenericResponse {
     web::block(move || -> Multiple<Tag> {
         let data = data.lock().unwrap();
         let conn = &data.conn_pool.get().unwrap();
-        Ok(tag_repository::index(conn)?)
+        Ok(tag_service::index(conn)?)
     })
     .await
     .map(|tags| ok_closure(tags))
@@ -35,10 +35,10 @@ pub async fn store(
         let conn = &data.conn_pool.get().unwrap();
         let mut new_tag: NewTag = payload.into();
         new_tag.user_id = auth_user.id;
-        Ok(tag_repository::store(conn, new_tag)?)
+        Ok(tag_service::store(conn, new_tag)?)
     })
     .await
-    .map(|tags| ok_closure(tags))
+    .map(|tag| ok_closure(tag))
     .map_err(|err| match err {
         BlockingError::Error(service_error) => service_error,
         BlockingError::Canceled => ServiceError::InternalServerError,

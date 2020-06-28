@@ -33,7 +33,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     )
     .service(
         web::scope("/tags")
-            .service(controllers::tag_controller::index)
+        .service(controllers::tag_controller::index)
             .service(controllers::tag_controller::store),
     );
     // cfg.service(
